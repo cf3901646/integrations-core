@@ -12,6 +12,6 @@
             "critical"
         ],
         "name": "Can Connect",
-        "description": "Returns `CRITICAL` if the Agent cannot connect to the PerfServlet for any reason. Returns `OK` otherwise."
+        "description": "Returns `CRITICAL` if the Agent cannot retrieve the PerfServlet response, or retrieves one it cannot parse. Returns `OK` once a response has been fetched and parsed, which does not guarantee that the document describes any node, server, or statistic."
     }
 ]

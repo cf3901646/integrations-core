@@ -126,9 +126,7 @@ class IbmWasCheck(AgentCheck):
         except requests.RequestException as e:
             # Covers read timeouts too: ReadTimeout descends from Timeout, not ConnectionError, so
             # narrower clauses let it escape and the run reports no service check at all.
-            self.warning(
-                "Couldn't connect to URL: %s with exception: %s. Please verify the address is reachable", self.url, e
-            )
+            self.warning("Request to %s failed: %s", self.url, e)
             self.submit_service_checks(AgentCheck.CRITICAL)
             raise e
         return resp.content

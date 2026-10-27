@@ -135,6 +135,22 @@ def test_malformed_xml_reports_critical(instance, check, aggregator, caplog):
     assert 'Unable to parse the XML response' in caplog.text
 
 
+def test_parsed_but_empty_document_reports_ok_without_metrics(instance, check, aggregator):
+    # Pins the can_connect contract documented in assets/service_checks.json: OK means the response
+    # was fetched and parsed, not that it describes any node, server, or statistic. Metric absence
+    # is the only signal that the servlet served an empty or unexpected document.
+    response = mock.MagicMock(content=b'<Nodes/>')
+    response.raise_for_status.return_value = None
+
+    with mock.patch('datadog_checks.base.utils.http.requests.Session.get', return_value=response):
+        check = check(instance)
+        check.check(instance)
+
+    tags = ['url:{}'.format(instance['servlet_url']), 'key1:value1']
+    aggregator.assert_service_check('ibm_was.can_connect', status=AgentCheck.OK, tags=tags, count=1)
+    assert aggregator.metric_names == ['ibm_was.can_connect']
+
+
 def test_right_server_tag(instance, check, aggregator):
     del instance['custom_queries']
     with mock.patch(
